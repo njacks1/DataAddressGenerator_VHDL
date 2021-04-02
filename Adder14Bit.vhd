@@ -1,7 +1,5 @@
 library ieee;
 use ieee.std_logic_1164.all;
-use ieee.std_logic_unsigned.all;
-use ieee.std_logic_arith.all;
 use ieee.numeric_std.all;
 
 entity Adder14Bit is  
@@ -13,5 +11,5 @@ end Adder14Bit;
 
 architecture behav of Adder14Bit is
     begin
-        output <= unsigned(input1) + signed(input2);
+        output <= std_logic_vector(signed(input1) + signed(input2));	--Cannot add an unsigned and signed together, it must be both of the same type!
     end behav;
