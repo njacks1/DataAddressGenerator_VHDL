@@ -11,7 +11,7 @@ end ModulusLogic;
 
 architecture behav of ModulusLogic is
     begin
-        process(input_adder)
+        process(input_adder, input_lreg)
             variable i : integer;
 	    variable L : integer;
             variable o : integer;
