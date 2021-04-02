@@ -14,7 +14,7 @@ end BitReverse14Bit;
 architecture behav of BitReverse14Bit is
     signal temp : std_logic_vector(13 downto 0);
     begin
-        process(enable, input1)
+        process(enable, input)
             begin
                 if(enable = '1') then
                     temp(0) <= input(13);
