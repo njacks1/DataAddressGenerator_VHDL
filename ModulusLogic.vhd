@@ -13,10 +13,10 @@ architecture behav of ModulusLogic is
     begin
         process(input_adder, input_lreg)
             variable i : integer;
-	    variable L : integer;
+	        variable L : integer;
             variable o : integer;
             begin
-		i := to_integer(unsigned(input_adder));
+		        i := to_integer(unsigned(input_adder));
             	L := to_integer(unsigned(input_lreg));
                 if(L = 0) then
                     output <= input_adder;  --Linear
