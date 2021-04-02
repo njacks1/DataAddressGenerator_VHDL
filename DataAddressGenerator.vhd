@@ -11,6 +11,7 @@ entity DataAddressGenerator is
         mux_select : in std_logic_vector(6 downto 0);       --Mux Selects
         register_load : in std_logic_vector(11 downto 0);   --Register load bits
         tristate_enable : in std_logic_vector(2 downto 0);  --Tri State Buffer enable bits
+        reset : in std_logic;
         address : out std_logic_vector(13 downto 0)         --Address generated from Data Address Generator
     );
 end DataAddressGenerator;
@@ -87,47 +88,47 @@ architecture behav of DataAddressGenerator is
 
 	begin
         --This stuff needs to change------------
-        stk_underflow <= sig10(0) or sig10(1);
-        stk_overflow <= sig9(0) or sig9(1);
-	    sig15 <= sig2 and sig3;
+        --stk_underflow <= sig10(0) or sig10(1);
+        --stk_overflow <= sig9(0) or sig9(1);
+	    --sig15 <= sig2 and sig3;
         ----------------------------------------
 
         --L Registers
-        L0 : Register14 port map();
-        L1 : Register14 port map();
-        L2 : Register14 port map();
-        L3 : Register14 port map();
+        L0 : Register14 port map(clk, register_load(0), reset, DMD(13 downto 0), sig0);
+        L1 : Register14 port map(clk, register_load(1), reset, DMD(13 downto 0), sig1);
+        L2 : Register14 port map(clk, register_load(2), reset, DMD(13 downto 0), sig2);
+        L3 : Register14 port map(clk, register_load(3), reset, DMD(13 downto 0), sig3);
 
         --I Registers
-        I0 : Register14 port map();
-        I1 : Register14 port map();
-        I2 : Register14 port map();
-        I3 : Register14 port map();
+        I0 : Register14 port map(clk, register_load(4), reset, sig15, sig4);
+        I1 : Register14 port map(clk, register_load(5), reset, sig15, sig5);
+        I2 : Register14 port map(clk, register_load(6), reset, sig15, sig6);
+        I3 : Register14 port map(clk, register_load(7), reset, sig15, sig7);
 
         --M Registers
-        M0 : Register14 port map();
-        M1 : Register14 port map();
-        M2 : Register14 port map();
-        M3 : Register14 port map();
+        M0 : Register14 port map(clk, register_load(8), reset, DMD(13 downto 0), sig8);
+        M1 : Register14 port map(clk, register_load(9), reset, DMD(13 downto 0), sig9);
+        M2 : Register14 port map(clk, register_load(10), reset, DMD(13 downto 0), sig10);
+        M3 : Register14 port map(clk, register_load(11), reset, DMD(13 downto 0), sig11);
 
         --MUXs
-        L_MUX : Mux4to1_14bit port map();           --L(0 to 3) output MUX
-        I_MUX : Mux4to1_14bit port map();           --I(0 to 3) output MUX
-        M_MUX : Mux4to1_14bit port map();           --M(0 to 3) output MUX
-        L_Sel_MUX : Mux2to1_14bit port map();       --L input MUX
+        L_MUX : Mux4to1_14bit port map(mux_select(1 downto 0), sig0, sig1, sig2, sig3, sig12);           --L(0 to 3) output MUX
+        I_MUX : Mux4to1_14bit port map(mux_select(3 downto 2), sig4, sig5, sig6, sig7, sig13);           --I(0 to 3) output MUX
+        M_MUX : Mux4to1_14bit port map(mux_select(5 downto 4), sig8, sig9, sig10, sig11, sig14);           --M(0 to 3) output MUX
+        L_Sel_MUX : Mux2to1_14bit port map(mux_select(6), sig16, DMD(13 downto 0), sig15);       --L input MUX
 
         --14Bit Adder
-        Adder : Adder14Bit port map();              --(I + M)
+        Adder : Adder14Bit port map(sig13, sig14, sig17);              --(I + M)
 
         --Modulus Logic
-        Modulus : ModulusLogic port map();          --Provides Linear or Circular Buffer functionality
+        Modulus : ModulusLogic port map(sig12, sig17, sig16);          --Provides Linear or Circular Buffer functionality
 
         --Bit Reverse
-        Reverse : BitReverse14Bit port map();       --Reverse I register is enabled, otherwise is simply a passthrough with no change
+        Reverse : BitReverse14Bit port map(bit_reversal_enable, sig13, address);       --Reverse I register is enabled, otherwise is simply a passthrough with no change
 
         --TriStateBuffers
-        L_TSB : TriStateBuffer_16Bit port map();              --Always disable this for Demo
-        I_TSB : TriStateBuffer_16Bit port map();              --Always disable this for Demo
-        M_TSB : TriStateBuffer_16Bit_special port map();      --Always disable this for Demo
+        L_TSB : TriStateBuffer_16Bit port map(tristate_enable(2), sig12, DMD);              --Always disable this for Demo
+        I_TSB : TriStateBuffer_16Bit port map(tristate_enable(1), sig13, DMD);              --Always disable this for Demo
+        M_TSB : TriStateBuffer_16Bit_special port map(tristate_enable(0), sig14, DMD);      --Always disable this for Demo
     
     end behav;
